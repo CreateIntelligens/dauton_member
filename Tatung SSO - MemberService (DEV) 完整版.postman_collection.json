@@ -1,0 +1,784 @@
+{
+  "info": {
+    "_postman_id": "dca634f2-32ec-4523-bcd4-5ff87581e54e",
+    "name": "Tatung SSO - MemberService (DEV) 完整版",
+    "description": "大同 SSO 測試區 - TSTI.TatungServices.MemberService\n\nBase URL: https://tatungssodev.azurewebsites.net/service\nSwagger: https://tatungssodev.azurewebsites.net/service/swagger/ui/index#/\nSwagger JSON: https://tatungssodev.azurewebsites.net/service/swagger/docs/v1\n\nClientId: aicreate360\nClient Secret: 3Fstg56cAe59f8?xDT9Hb81Kp567E78Ae\n\nToken Endpoint: https://tatungssodev.azurewebsites.net/newgateway/oauth/token\n\n---\n使用說明:\n1. 先打 OAuth Token 取得 access_token（自動儲存到變數）\n2. Account 類 API 的 clientId/clientSecret 帶在 body 裡（已自動帶入變數）\n3. Member 類 API 需要 Bearer Token（Collection 層級已設定，自動帶入）\n4. 部分 Account API（刪除帳號、修改密碼）也需要 Bearer Token",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37338860",
+    "_collection_link": "https://go.postman.co/collection/37338860-dca634f2-32ec-4523-bcd4-5ff87581e54e?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "🔐 OAuth Token",
+      "item": [
+        {
+          "name": "取得 Token (client_credentials)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "    console.log('✅ access_token 已自動儲存');",
+                  "    console.log('Token Type: ' + jsonData.token_type);",
+                  "    console.log('Expires In: ' + jsonData.expires_in + ' seconds');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "client_credentials",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{client_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{client_secret}}",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/newgateway/oauth/token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "newgateway",
+                "oauth",
+                "token"
+              ]
+            },
+            "description": "使用 client_credentials 取得 access_token。\n成功後 token 會自動存到 collection variable。"
+          },
+          "response": []
+        },
+        {
+          "name": "取得 Token (password grant)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    pm.collectionVariables.set('access_token', jsonData.access_token);",
+                  "    console.log('✅ access_token 已自動儲存');",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "grant_type",
+                  "value": "password",
+                  "type": "text"
+                },
+                {
+                  "key": "client_id",
+                  "value": "{{client_id}}",
+                  "type": "text"
+                },
+                {
+                  "key": "client_secret",
+                  "value": "{{client_secret}}",
+                  "type": "text"
+                },
+                {
+                  "key": "username",
+                  "value": "0912345678",
+                  "description": "手機號碼",
+                  "type": "text"
+                },
+                {
+                  "key": "password",
+                  "value": "",
+                  "description": "會員密碼",
+                  "type": "text"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/newgateway/oauth/token",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "newgateway",
+                "oauth",
+                "token"
+              ]
+            },
+            "description": "使用 password grant type 取得 access_token（需要會員帳密）。"
+          },
+          "response": []
+        }
+      ],
+      "description": "OAuth 2.0 Token 取得\n\n先執行此資料夾的請求取得 token，後續 Member API 才能使用。"
+    },
+    {
+      "name": "👤 Account - 帳號管理",
+      "item": [
+        {
+          "name": "STEP1: checkUsernameUsed - 檢查帳號是否已連結",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Code: ' + jsonData.code);",
+                  "    console.log('Message: ' + jsonData.message);",
+                  "    if (jsonData.data) {",
+                  "        console.log('isLinked: ' + jsonData.data.isLinked);",
+                  "        console.log('usernameType: ' + jsonData.data.usernameType);",
+                  "        if (jsonData.data.existMembers && jsonData.data.existMembers.length > 0) {",
+                  "            console.log('existMembers count: ' + jsonData.data.existMembers.length);",
+                  "            jsonData.data.existMembers.forEach(function(m, i) {",
+                  "                console.log('  [' + i + '] serialNumber: ' + m.serialNumber + ', hasECAccount: ' + m.hasECAccount + ', ssoAccountId: ' + m.ssoAccountId);",
+                  "            });",
+                  "        }",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"0912345678\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/checkUsernameUsed",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "checkUsernameUsed"
+              ]
+            },
+            "description": "STEP1: 登入頁面1 - 輸入手機號碼或 Email，檢查是否已經連結帳號。\n\n回傳:\n- isLinked: 是否已連結\n- usernameType: MOBILE 或 EMAIL\n- existMembers: 關聯的會員資料（未連結時才有值）\n  - serialNumber, hasECAccount, ssoAccountId 等"
+          },
+          "response": []
+        },
+        {
+          "name": "STEP4a: sendconfirmcode - 發送驗證碼",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Code: ' + jsonData.code);",
+                  "    console.log('Message: ' + jsonData.message);",
+                  "    if (jsonData.data) {",
+                  "        pm.collectionVariables.set('ticket', jsonData.data.ticket);",
+                  "        console.log('✅ ticket 已自動儲存: ' + jsonData.data.ticket);",
+                  "        console.log('confirmCode: ' + jsonData.data.confirmCode);",
+                  "        console.log('isSuccessful: ' + jsonData.data.isSuccessful);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"0912345678\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/sendconfirmcode",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "sendconfirmcode"
+              ]
+            },
+            "description": "STEP4: 發送手機/Email 驗證碼。\n\n回傳:\n- ticket: 識別碼（自動儲存到變數，verifyconfirmcode 會用到）\n- confirmCode: 驗證碼（測試環境可能直接回傳）\n- isSuccessful: 發送結果"
+          },
+          "response": []
+        },
+        {
+          "name": "STEP4b: verifyconfirmcode - 檢查驗證碼",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    var jsonData = pm.response.json();",
+                  "    console.log('Code: ' + jsonData.code);",
+                  "    console.log('Message: ' + jsonData.message);",
+                  "    if (jsonData.data) {",
+                  "        pm.collectionVariables.set('register_token', jsonData.data.registerToken);",
+                  "        console.log('✅ register_token 已自動儲存: ' + jsonData.data.registerToken);",
+                  "        console.log('isSuccessful: ' + jsonData.data.isSuccessful);",
+                  "    }",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"0912345678\",\n    \"ticket\": \"{{ticket}}\",\n    \"confirmCode\": \"輸入收到的驗證碼\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/verifyconfirmcode",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "verifyconfirmcode"
+              ]
+            },
+            "description": "STEP4: 驗證手機/Email 驗證碼。\n\nticket 變數由 sendconfirmcode 自動帶入。\n\n回傳:\n- registerToken: 註冊通行碼（自動儲存，registeraccount/registerlink 會用到）\n- isSuccessful: 驗證結果"
+          },
+          "response": []
+        },
+        {
+          "name": "STEP5: registeraccount - 註冊新會員",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"registerToken\": \"{{register_token}}\",\n    \"name\": \"測試會員\",\n    \"password\": \"Test123456\",\n    \"birthday\": \"1990-01-01T00:00:00\",\n    \"sex\": \"M\",\n    \"zip\": \"104\",\n    \"city\": \"臺北市\",\n    \"district\": \"中山區\",\n    \"address\": \"測試路1號\",\n    \"mobile\": \"0912345678\",\n    \"email\": \"test@example.com\",\n    \"homePhoneArea\": \"\",\n    \"homePhone\": \"\",\n    \"homePhoneExtension\": \"\",\n    \"marketSurvey\": \"\",\n    \"favoriteShop\": \"\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/registeraccount",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "registeraccount"
+              ]
+            },
+            "description": "STEP5: 註冊新會員。\n\n必填欄位: registerToken, name, password, birthday, sex, zip, city, district, address, mobile, clientId, clientSecret\n選填: email, homePhoneArea, homePhone, homePhoneExtension, marketSurvey, favoriteShop\n\n密碼規則:\n1. 長度介於 6~20\n2. 至少一個數字\n3. 至少一個大寫或小寫字母\n\nregisterToken 由 verifyconfirmcode 自動帶入。\n\n回傳:\n- serialNumber: 會員系統編號\n- memberCardNumber: 會員卡號\n- accountId: SSO帳號Id"
+          },
+          "response": []
+        },
+        {
+          "name": "STEP6/7: registerlink - 綁定會員",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"registerToken\": \"{{register_token}}\",\n    \"ssoAccountId\": 0,\n    \"serialNumber\": \"\",\n    \"needVerifyUserAccount\": false,\n    \"ssoUserAccount\": \"\",\n    \"password\": \"Test123456\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/registerlink",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "registerlink"
+              ]
+            },
+            "description": "STEP6/7: 綁定會員（設定密碼/輸入密碼）。\n\n必填: registerToken, ssoAccountId, needVerifyUserAccount, password, clientId, clientSecret\n選填: serialNumber, ssoUserAccount\n\n- 如果 hasECAccount=true，needVerifyUserAccount 需設為 true，並提供 ssoUserAccount 和 password 驗證\n- ssoAccountId 從 checkUsernameUsed 的 existMembers 取得\n\n回傳:\n- serialNumber: 會員系統編號\n- memberCardNumber: 會員卡號\n- accountId: SSO帳號Id"
+          },
+          "response": []
+        },
+        {
+          "name": "resetUserAccountPassword - 重設指定帳號密碼",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"registerToken\": \"{{register_token}}\",\n    \"ssoAccountId\": 0,\n    \"ssoUserAccount\": \"\",\n    \"isECAccount\": false,\n    \"serialNumber\": \"\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/resetUserAccountPassword",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "resetUserAccountPassword"
+              ]
+            },
+            "description": "重設指定 UserAccount 的密碼。\n\n必填: registerToken, clientId, clientSecret\n選填: ssoAccountId, ssoUserAccount, isECAccount, serialNumber\n\n密碼會以簡訊寄送。"
+          },
+          "response": []
+        },
+        {
+          "name": "changePassword - 修改密碼 🔒需Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}",
+                "description": "需要 Bearer Token"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"oldPassword\": \"\",\n    \"newPassword\": \"\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/changePassword",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "changePassword"
+              ]
+            },
+            "description": "修改密碼（需要登入後的 Bearer Token）。\n\n必填: oldPassword, clientId, clientSecret\n選填: newPassword\n\n密碼規則:\n1. 長度介於 6~20\n2. 至少一個數字\n3. 至少一個大寫或小寫字母"
+          },
+          "response": []
+        },
+        {
+          "name": "resetPassword - 重設密碼",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"username\": \"0912345678\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/resetPassword",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "resetPassword"
+              ]
+            },
+            "description": "重設密碼（忘記密碼用）。\n\n必填: username（手機或Email，暫時只支援手機）, clientId, clientSecret"
+          },
+          "response": []
+        },
+        {
+          "name": "senddeleteconfirmcode - 發送帳號刪除驗證碼 🔒需Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}",
+                "description": "需要 Bearer Token"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/senddeleteconfirmcode",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "senddeleteconfirmcode"
+              ]
+            },
+            "description": "發送帳號刪除驗證碼（需要登入後的 Bearer Token）。\n\n回傳:\n- confirmCode: 驗證碼"
+          },
+          "response": []
+        },
+        {
+          "name": "verifydeleteconfirmcode - 驗證帳號刪除驗證碼 🔒需Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}",
+                "description": "需要 Bearer Token"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"deleteConfirmCode\": \"\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/account/verifydeleteconfirmcode",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "account",
+                "verifydeleteconfirmcode"
+              ]
+            },
+            "description": "驗證帳號刪除驗證碼（需要登入後的 Bearer Token）。\n\n必填: deleteConfirmCode, clientId, clientSecret\n\n回傳:\n- isSuccessful: 驗證結果"
+          },
+          "response": []
+        }
+      ],
+      "description": "Account 帳號管理 API\n\n⚠️ 這些 API 的 clientId/clientSecret 是帶在 JSON body 裡面，不是 OAuth header。\n\n標示 🔒需Token 的 API 需要在 header 帶 Bearer Token。"
+    },
+    {
+      "name": "📋 Member - 會員資料 🔒全部需Token",
+      "item": [
+        {
+          "name": "GET member/info - 取得會員個人資料",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/service/member/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "member",
+                "info"
+              ]
+            },
+            "description": "取得會員個人資料（需要 Bearer Token）。\n\n回傳欄位包含:\n- serialNumber, name, memberCardNumber, memberCardNumberBarcode\n- memberCardType: 0一般 1同仁 2聯名卡友 3尊爵 4活動 5金鑽 6虛實整合\n- sex, birthday, email, mobile\n- 地址: zip, city, district, address\n- phoneBarcode: 手機載具\n- interestContent, interestProduct, favoriteShop, marketSurvey\n- effectiveDate, expiryDate, joinDate, lastBuyDate\n- point: 累積點數\n- rateInfo: 累積升等資訊\n- memberClass: 會員等級\n- SSO帳號資訊: accountId, accountEmail, accountMobile 等"
+          },
+          "response": []
+        },
+        {
+          "name": "PUT member/info - 修改會員個人資料",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"\",\n    \"sex\": \"M\",\n    \"birthday\": \"1990-01-01T00:00:00\",\n    \"email\": \"\",\n    \"homePhoneArea\": \"\",\n    \"homePhone\": \"\",\n    \"homePhoneExtension\": \"\",\n    \"zip\": \"\",\n    \"city\": \"\",\n    \"district\": \"\",\n    \"address\": \"\",\n    \"phoneBarcode\": \"\",\n    \"marketSurvey\": \"\",\n    \"favoriteShop\": \"\",\n    \"clientId\": \"{{client_id}}\",\n    \"clientSecret\": \"{{client_secret}}\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/service/member/info",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "member",
+                "info"
+              ]
+            },
+            "description": "修改會員個人資料（需要 Bearer Token）。\n\n必填: clientId, clientSecret\n選填: name, sex, birthday, email, homePhoneArea, homePhone, homePhoneExtension, zip, city, district, address, phoneBarcode, marketSurvey, favoriteShop\n\n回傳修改後的完整會員資料。"
+          },
+          "response": []
+        },
+        {
+          "name": "GET member/virtualcoupon - 取得虛擬優惠券",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/service/member/virtualcoupon",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "member",
+                "virtualcoupon"
+              ]
+            },
+            "description": "取得會員虛擬優惠券（需要 Bearer Token）。\n\n回傳:\n- typeCount: 優惠券種類數\n- count: 總張數\n- unusedCount: 未使用總張數\n- usedCount: 已使用總張數\n- couponList: 優惠券列表\n  - expireDate (YYYYMMDD), activity, couponType\n  - amount: 面額（滿千折百折價券、生日禮折價券）\n  - quantity, status, pictureURL"
+          },
+          "response": []
+        },
+        {
+          "name": "GET member/coupon - 取得折價券",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/service/member/coupon?isActive=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "member",
+                "coupon"
+              ],
+              "query": [
+                {
+                  "key": "isActive",
+                  "value": "true",
+                  "description": "是否只查有效的折價券（選填）"
+                }
+              ]
+            },
+            "description": "取得會員折價券（需要 Bearer Token）。\n\n查詢參數:\n- isActive (boolean, 選填): 是否只查有效的\n\n回傳:\n- CouponSum: 購物金總計\n- GoldCouponSum: 黃金週購物幣總計\n- CouponList: 折價券列表\n  - Name: 活動名稱\n  - Code: 券號\n  - Credit: 發送金額\n  - Balance: 餘額\n  - EffectStartDate, EffectEndDate\n  - Status, Type, UseRule"
+          },
+          "response": []
+        },
+        {
+          "name": "GET member/bonus/summary - 取得點數摘要",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/service/member/bonus/summary",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "member",
+                "bonus",
+                "summary"
+              ]
+            },
+            "description": "取得會員點數摘要（需要 Bearer Token）。\n\n回傳:\n- ClosedExpireDate: 最接近的有效日期\n- AllAvailableBonus: 總有效點數"
+          },
+          "response": []
+        },
+        {
+          "name": "GET member/bonus - 取得點數資訊",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "bearer {{access_token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}/service/member/bonus?monthLimit=12&needCouponData=true",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "service",
+                "member",
+                "bonus"
+              ],
+              "query": [
+                {
+                  "key": "monthLimit",
+                  "value": "12",
+                  "description": "查詢月份範圍（選填）"
+                },
+                {
+                  "key": "needCouponData",
+                  "value": "true",
+                  "description": "是否需要折價券資料（選填）"
+                }
+              ]
+            },
+            "description": "取得會員點數資訊（需要 Bearer Token）。\n\n查詢參數:\n- monthLimit (int, 選填): 查詢月份範圍\n- needCouponData (boolean, 選填): 是否需要折價券資料\n\n回傳:\n- data: 點數列表\n  - ExpireDate: 有效日期\n  - AvailableBonus: 有效點數\n- extradata: 額外的折價券資訊"
+          },
+          "response": []
+        }
+      ],
+      "description": "Member 會員資料 API\n\n⚠️ 此資料夾所有 API 都需要 Bearer Token（從 OAuth Token 取得）。"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{access_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://tatungssodev.azurewebsites.net",
+      "type": "string"
+    },
+    {
+      "key": "client_id",
+      "value": "aicreate360",
+      "type": "string"
+    },
+    {
+      "key": "client_secret",
+      "value": "3Fstg56cAe59f8?xDT9Hb81Kp567E78Ae",
+      "type": "string"
+    },
+    {
+      "key": "access_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "ticket",
+      "value": "",
+      "type": "string",
+      "description": "驗證碼識別碼（由 sendconfirmcode 回傳）"
+    },
+    {
+      "key": "register_token",
+      "value": "",
+      "type": "string",
+      "description": "註冊通行碼（由 verifyconfirmcode 回傳）"
+    }
+  ]
+}

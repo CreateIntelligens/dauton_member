@@ -1,0 +1,13 @@
+{
+  "name": "dauton-member",
+  "version": "1.0.0",
+  "description": "大同會員中心 - Line個人化服務升級",
+  "scripts": {
+    "dev": "sh start-dev.sh",
+    "build": "sh build.sh",
+    "preview": "cd dist && python3 -m http.server 8002"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>大同會員中心 - Line個人化服務升級</title>
+  <link rel="stylesheet" href="tatung_member_login/assets/css/style.bce052cf.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header">
+      <div class="header-bar">
+        <img src="tatung_member_login/assets/images/tatung-logo.png" alt="TATUNG" class="header-logo">
+      </div>
+      <div class="header-title">
+        <span>Line個人化服務升級</span>
+      </div>
+    </header>
+    <main id="page-container"></main>
+    <footer class="app-footer">
+      <p>大同股份有限公司 版權所有 &copy; 2016 Tatung Co.</p>
+    </footer>
+  </div>
+
+  <!-- API Endpoints Configuration -->
+  <script>
+    window.API_CONFIG = {
+      BASE_URL: 'http://localhost:3001',
+      CLIENT_ID: 'aicreate360',
+      CLIENT_SECRET: '3Fstg56cAe59f8?xDT9Hb81Kp567E78Ae',
+      REFRESH_TOKEN: '4618ae9c655f47ffbaf80ae0ecf8f6f4',
+
+      // 後端系統 URL (用於紀錄 LINE 用戶登入資訊)
+      BACKEND_LOGIN_URL: 'https://line.uat.tatung2025.aitago.tw',
+
+      // OAuth Token
+      TOKEN_ENDPOINT: '/newgateway/oauth/token',
+
+      // Account API
+      CHECK_USERNAME_USED: '/service/account/checkUsernameUsed',
+      SEND_CONFIRM_CODE: '/service/account/sendconfirmcode',
+      VERIFY_CONFIRM_CODE: '/service/account/verifyconfirmcode',
+      REGISTER_ACCOUNT: '/service/account/registeraccount',
+      REGISTER_LINK: '/service/account/registerlink',
+      RESET_PASSWORD: '/service/account/resetPassword',
+      RESET_USER_ACCOUNT_PASSWORD: '/service/account/resetUserAccountPassword',
+      CHANGE_PASSWORD: '/service/account/changePassword',
+      SEND_DELETE_CONFIRM_CODE: '/service/account/senddeleteconfirmcode',
+      VERIFY_DELETE_CONFIRM_CODE: '/service/account/verifydeleteconfirmcode',
+
+      // Member API
+      MEMBER_INFO: '/service/member/info',
+      MEMBER_VIRTUAL_COUPON: '/service/member/virtualcoupon',
+      MEMBER_COUPON: '/service/member/coupon',
+      MEMBER_BONUS_SUMMARY: '/service/member/bonus/summary',
+      MEMBER_BONUS: '/service/member/bonus',
+    };
+  </script>
+
+  <script src="tatung_member_login/assets/js/api.b2496692.js"></script>
+  <script src="tatung_member_login/assets/js/router.d7b5522e.js"></script>
+  <script src="tatung_member_login/assets/js/pages/terms.d1ab37d0.js"></script>
+  <script src="tatung_member_login/assets/js/pages/login.f136cb88.js"></script>
+  <script src="tatung_member_login/assets/js/pages/verify.302e5471.js"></script>
+  <script src="tatung_member_login/assets/js/pages/loginPassword.c0a53db1.js"></script>
+  <script src="tatung_member_login/assets/js/pages/privacy.c85daa61.js"></script>
+  <script src="tatung_member_login/assets/js/pages/register.48c2f5d8.js"></script>
+  <script src="tatung_member_login/assets/js/pages/success.47795bb2.js"></script>
+  <script src="tatung_member_login/assets/js/pages/bindCard.bdd012cc.js"></script>
+  <script src="tatung_member_login/assets/js/pages/agreement.40972e91.js"></script>
+  <script src="tatung_member_login/assets/js/pages/forgotPassword.e44ba4dd.js"></script>
+  <script src="tatung_member_login/assets/js/app.f9d0ce7f.js"></script>
+</body>
+</html>

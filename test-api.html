@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API 測試工具</title>
+  <style>
+    body {
+      font-family: 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 50px auto;
+      padding: 20px;
+      background: #f5f5f5;
+    }
+    .test-section {
+      background: white;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    h2 { color: #dc000c; }
+    button {
+      background: #dc000c;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin: 5px;
+    }
+    button:hover { background: #c0000a; }
+    input {
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      width: 200px;
+      margin: 5px;
+    }
+    pre {
+      background: #f8f8f8;
+      padding: 15px;
+      border-radius: 4px;
+      overflow-x: auto;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+    .error { color: #dc000c; }
+    .success { color: #28a745; }
+  </style>
+</head>
+<body>
+  <h1>🔍 大同會員 API 測試工具</h1>
+
+  <div class="test-section">
+    <h2>1. 測試 CORS 與網路連線</h2>
+    <button onclick="testCORS()">測試 API 連線</button>
+    <pre id="cors-result">等待測試...</pre>
+  </div>
+
+  <div class="test-section">
+    <h2>2. 取得 OAuth Token</h2>
+    <button onclick="testGetToken()">取得 Token</button>
+    <pre id="token-result">等待測試...</pre>
+  </div>
+
+  <div class="test-section">
+    <h2>3. 檢查帳號是否已連結</h2>
+    <input type="tel" id="check-phone" placeholder="手機號碼" value="0912345678" maxlength="10">
+    <button onclick="testCheckUsername()">檢查帳號</button>
+    <pre id="check-result">等待測試...</pre>
+  </div>
+
+  <div class="test-section">
+    <h2>4. 發送驗證碼</h2>
+    <input type="tel" id="send-phone" placeholder="手機號碼" value="0912345678" maxlength="10">
+    <button onclick="testSendCode()">發送驗證碼</button>
+    <pre id="send-result">等待測試...</pre>
+  </div>
+
+  <script>
+    const API_CONFIG = {
+      BASE_URL: 'https://tatungssodev.azurewebsites.net',
+      CLIENT_ID: 'aicreate360',
+      CLIENT_SECRET: '3Fstg56cAe59f8?xDT9Hb81Kp567E78Ae',
+    };
+
+    let accessToken = '';
+
+    async function testCORS() {
+      const resultEl = document.getElementById('cors-result');
+      resultEl.textContent = '測試中...';
+
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/service/account/checkUsernameUsed`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: '0912345678',
+            clientId: API_CONFIG.CLIENT_ID,
+            clientSecret: API_CONFIG.CLIENT_SECRET,
+          }),
+        });
+
+        const data = await response.json();
+        resultEl.innerHTML = `<span class="success">✅ 連線成功！</span>\n\n回應狀態: ${response.status}\n回應內容:\n${JSON.stringify(data, null, 2)}`;
+      } catch (err) {
+        resultEl.innerHTML = `<span class="error">❌ 連線失敗！</span>\n\n錯誤訊息: ${err.message}\n\n可能原因：\n1. CORS 政策阻擋（瀏覽器安全限制）\n2. 網路連線問題\n3. API 伺服器無法連線\n\n完整錯誤:\n${err.stack}`;
+      }
+    }
+
+    async function testGetToken() {
+      const resultEl = document.getElementById('token-result');
+      resultEl.textContent = '取得 Token 中...';
+
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/newgateway/oauth/token`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({
+            grant_type: 'client_credentials',
+            client_id: API_CONFIG.CLIENT_ID,
+            client_secret: API_CONFIG.CLIENT_SECRET,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.access_token) {
+          accessToken = data.access_token;
+          resultEl.innerHTML = `<span class="success">✅ Token 取得成功！</span>\n\nToken: ${accessToken.substring(0, 50)}...\n過期時間: ${data.expires_in} 秒\n\n完整回應:\n${JSON.stringify(data, null, 2)}`;
+        } else {
+          resultEl.innerHTML = `<span class="error">❌ Token 取得失敗</span>\n\n回應:\n${JSON.stringify(data, null, 2)}`;
+        }
+      } catch (err) {
+        resultEl.innerHTML = `<span class="error">❌ 錯誤</span>\n\n${err.message}\n\n${err.stack}`;
+      }
+    }
+
+    async function testCheckUsername() {
+      const resultEl = document.getElementById('check-result');
+      const phone = document.getElementById('check-phone').value;
+      resultEl.textContent = '檢查中...';
+
+      if (!accessToken) {
+        resultEl.innerHTML = '<span class="error">❌ 請先取得 Token</span>';
+        return;
+      }
+
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/service/account/checkUsernameUsed`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: phone,
+            clientId: API_CONFIG.CLIENT_ID,
+            clientSecret: API_CONFIG.CLIENT_SECRET,
+          }),
+        });
+
+        const data = await response.json();
+        resultEl.innerHTML = `<span class="success">✅ 檢查完成！</span>\n\n回應狀態: ${response.status}\n\n結果:\n${JSON.stringify(data, null, 2)}`;
+      } catch (err) {
+        resultEl.innerHTML = `<span class="error">❌ 錯誤</span>\n\n${err.message}\n\n${err.stack}`;
+      }
+    }
+
+    async function testSendCode() {
+      const resultEl = document.getElementById('send-result');
+      const phone = document.getElementById('send-phone').value;
+      resultEl.textContent = '發送驗證碼中...';
+
+      try {
+        const response = await fetch(`${API_CONFIG.BASE_URL}/service/account/sendconfirmcode`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            username: phone,
+            clientId: API_CONFIG.CLIENT_ID,
+            clientSecret: API_CONFIG.CLIENT_SECRET,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          resultEl.innerHTML = `<span class="success">✅ 驗證碼發送成功！</span>\n\n回應狀態: ${response.status}\n\n結果:\n${JSON.stringify(data, null, 2)}`;
+        } else {
+          resultEl.innerHTML = `<span class="error">❌ API 回應錯誤</span>\n\n狀態碼: ${response.status}\n回應:\n${JSON.stringify(data, null, 2)}`;
+        }
+      } catch (err) {
+        resultEl.innerHTML = `<span class="error">❌ 網路錯誤</span>\n\n錯誤類型: ${err.name}\n錯誤訊息: ${err.message}\n\n可能原因:\n1. CORS 跨域問題 - API 伺服器需要允許跨域請求\n2. 網路連線中斷\n3. API 伺服器無回應\n4. 請求被防火牆或代理伺服器阻擋\n\n完整錯誤:\n${err.stack}`;
+      }
+    }
+  </script>
+</body>
+</html>

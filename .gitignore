@@ -1,0 +1,33 @@
+# Node modules
+node_modules/
+
+# Build output - 保留 dist 因為是部署用的
+# dist/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+.env.local
+
+# Temporary files
+*.tmp
+.cache/
+
+# Claude settings
+.claude/settings.local.json
+
+# Proxy server output
+/private/

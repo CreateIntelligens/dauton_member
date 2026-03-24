@@ -1,0 +1,648 @@
+/* ============================================
+   大同會員中心 - Global Styles
+   ============================================ */
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  /* 防止手機端橫向滾動 */
+  overflow-x: hidden;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'Noto Sans TC', 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* 防止手機端橫向滾動 */
+  overflow-x: hidden;
+  /* 禁止文字選取（可選） */
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* 允許表單元素文字選取 */
+input, textarea, select {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+#app {
+  width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  background: #fff;
+}
+
+/* 適配更大的螢幕（桌面版才加陰影和最大寬度） */
+@media (min-width: 769px) {
+  #app {
+    max-width: 390px;
+    margin-top: 0;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  }
+}
+
+/* ============================================
+   Header (滿版，貼齊左右兩邊)
+   ============================================ */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  width: 100%;
+  /* 確保 header 完全貼齊左右邊緣 */
+  margin: 0;
+  padding: 0;
+}
+
+.header-bar {
+  background: #fff;
+  border-bottom: 2px solid #eb3847;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  /* 左右留 20px 內距給 logo */
+  padding: 0 20px;
+  width: 100%;
+}
+
+.header-logo {
+  height: 23px;
+  width: auto;
+}
+
+.header-title {
+  background: #fff;
+  border-bottom: 1px solid #cacaca;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  /* 完全貼齊，無 padding */
+  padding: 0;
+}
+
+.header-title span {
+  font-family: 'Inter', 'Noto Sans JP', sans-serif;
+  font-weight: 700;
+  font-size: 16px;
+  color: #5a5a5a;
+}
+
+/* ============================================
+   Footer
+   ============================================ */
+.app-footer {
+  padding: 20px;
+  text-align: center;
+}
+
+.app-footer p {
+  font-size: 12px;
+  color: #999;
+}
+
+/* ============================================
+   Page Container
+   ============================================ */
+#page-container {
+  padding: 20px;
+  min-height: calc(100vh - 160px);
+  background: #f5f5f5;
+}
+
+/* 手機版：內容區域最小高度 */
+@media (max-height: 667px) {
+  #page-container {
+    min-height: auto;
+    padding-bottom: 80px;
+  }
+}
+
+/* ============================================
+   Card (white content box)
+   ============================================ */
+.card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 24px 20px 30px;
+}
+
+/* ============================================
+   Typography
+   ============================================ */
+.page-title {
+  font-size: 20px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.page-desc {
+  font-size: 14px;
+  color: #5a5a5a;
+  line-height: 20px;
+  margin-bottom: 20px;
+}
+
+.required {
+  color: #dc000c;
+}
+
+/* ============================================
+   Form Elements
+   ============================================ */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 12px;
+}
+
+.form-input {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px 13px;
+  font-size: 14px; /* 提升到 14px，手機更好閱讀 */
+  color: #333;
+  background: #fff;
+  outline: none;
+  font-family: inherit;
+  /* 手機版優化 */
+  -webkit-appearance: none;
+  appearance: none;
+  /* 防止 iOS 自動縮放 */
+  font-size: max(14px, 1em);
+}
+
+.form-input::placeholder {
+  color: #6c757d;
+}
+
+.form-input:focus {
+  border-color: #eb3847;
+  /* 手機版：focus 時微光效果 */
+  box-shadow: 0 0 0 3px rgba(235, 56, 71, 0.1);
+}
+
+.form-input.disabled,
+.form-input[disabled] {
+  background: #efefef;
+  color: #5a5a5a;
+  opacity: 0.6;
+}
+
+/* Row layout for form fields */
+.form-row {
+  display: flex;
+  gap: 12px;
+}
+
+.form-row .form-input {
+  flex: 1;
+}
+
+.form-row-3 {
+  display: flex;
+  gap: 8px;
+}
+
+.form-row-3 .form-input {
+  flex: 1;
+}
+
+/* Select */
+.form-select {
+  width: 100%;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px 36px 10px 13px; /* 右側增加空間給箭頭 */
+  font-size: 14px; /* 手機版提升到 14px */
+  color: #333;
+  background: #fff;
+  outline: none;
+  font-family: inherit;
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  /* 防止 iOS 自動縮放 */
+  font-size: max(14px, 1em);
+  cursor: pointer;
+}
+
+.form-select:focus {
+  border-color: #eb3847;
+  box-shadow: 0 0 0 3px rgba(235, 56, 71, 0.1);
+}
+
+/* placeholder 樣式 */
+.form-select option:first-child {
+  color: #6c757d;
+}
+
+.form-select:not(:placeholder-shown) {
+  color: #333;
+}
+
+/* ============================================
+   Buttons
+   ============================================ */
+.btn {
+  display: block;
+  width: 100%;
+  padding: 12px 16px; /* 手機版加大點擊區域 */
+  border: none;
+  border-radius: 4px;
+  font-size: 14px; /* 提升字體大小 */
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  /* 手機版優化 */
+  -webkit-tap-highlight-color: rgba(0,0,0,0.1);
+  touch-action: manipulation;
+  user-select: none;
+  /* 防止 iOS 預設按鈕樣式 */
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.btn:active {
+  transform: scale(0.98);
+  opacity: 0.9;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-primary {
+  background: #dc000c;
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(220, 0, 12, 0.2);
+}
+
+.btn-primary:hover {
+  background: #c0000a;
+}
+
+.btn-primary:active {
+  background: #a80009;
+  box-shadow: 0 1px 2px rgba(220, 0, 12, 0.3);
+}
+
+/* ============================================
+   Checkbox
+   ============================================ */
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid #ddd;
+  border-radius: 2px;
+  appearance: none;
+  -webkit-appearance: none;
+  background: #fff;
+  cursor: pointer;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.checkbox-group input[type="checkbox"]:checked {
+  background: #dc000c;
+  border-color: #dc000c;
+}
+
+.checkbox-group input[type="checkbox"]:checked::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 2px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.checkbox-group label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  cursor: pointer;
+}
+
+.checkbox-inline {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.checkbox-inline .checkbox-group {
+  gap: 8px;
+}
+
+/* ============================================
+   Terms Page
+   ============================================ */
+.terms-box {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 21px;
+  height: 394px;
+  overflow-y: auto;
+  margin-bottom: 40px;
+}
+
+.terms-box::-webkit-scrollbar {
+  width: 8px;
+}
+
+.terms-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terms-box::-webkit-scrollbar-thumb {
+  background: #d9d9d9;
+  border-radius: 70px;
+}
+
+.terms-text {
+  font-size: 14px;
+  color: #555;
+  line-height: 21px;
+}
+
+.terms-text p {
+  margin-bottom: 4px;
+}
+
+.terms-text p.section-gap {
+  margin-top: 18px;
+}
+
+.terms-agreement {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  padding: 0 20px;
+}
+
+.terms-agreement .checkbox-group label {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+/* ============================================
+   Login Page
+   ============================================ */
+.login-info {
+  margin-bottom: 20px;
+}
+
+.login-info p {
+  font-size: 14px;
+  color: #5a5a5a;
+  line-height: 20px;
+}
+
+.login-info p:first-child {
+  margin-bottom: 12px;
+}
+
+.forgot-password-link {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 12px;
+  color: #dc000c;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.forgot-password-link:hover {
+  color: #c0000a;
+}
+
+/* ============================================
+   Verify Page
+   ============================================ */
+.verify-section {
+  margin-bottom: 20px;
+}
+
+/* ============================================
+   Register Page
+   ============================================ */
+.register-form .form-group:last-of-type {
+  margin-bottom: 20px;
+}
+
+.agreement-links {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.agreement-links .checkbox-group label {
+  color: #c00;
+  text-decoration: underline;
+  font-size: 14px;
+}
+
+/* ============================================
+   Bind Card Page
+   ============================================ */
+.bind-header-info {
+  background: #fff;
+  border-bottom: 1px solid #cacaca;
+  padding: 13px 23px;
+  margin: -20px -20px 32px -20px;
+}
+
+.bind-header-info p {
+  font-size: 12px;
+  color: #5a5a5a;
+  line-height: 20px;
+}
+
+.bind-header-info p.bold {
+  font-weight: 700;
+}
+
+.bind-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #5a5a5a;
+  text-align: center;
+  background: #fff;
+  border-bottom: 2px solid #eb3847;
+  padding: 17px 0;
+  margin: -20px -20px 0 -20px;
+}
+
+.member-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px 20px 20px 40px;
+  margin-bottom: 20px;
+  position: relative;
+  cursor: pointer;
+}
+
+.member-card.selected {
+  border-color: #dc000c;
+}
+
+.member-card-radio {
+  position: absolute;
+  left: 15px;
+  top: 21px;
+  width: 16px;
+  height: 16px;
+  border: 1.5px solid #ddd;
+  border-radius: 2px;
+  background: #fff;
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+}
+
+.member-card-radio:checked {
+  background: #dc000c;
+  border-color: #dc000c;
+}
+
+.member-card-radio:checked::after {
+  content: '';
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 5px;
+  height: 9px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.member-card-info {
+  margin-bottom: 8px;
+}
+
+.member-card-number {
+  font-size: 14px;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.member-card-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #5a5a5a;
+  margin-bottom: 8px;
+}
+
+.member-card-points {
+  font-size: 14px;
+  font-weight: 500;
+  color: #d28c0a;
+  margin-bottom: 8px;
+}
+
+.member-card-divider {
+  border: none;
+  border-top: 1px solid #ddd;
+  margin: 16px 0;
+}
+
+.member-card-detail {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.member-card-detail.sub {
+  font-weight: 500;
+  color: #5a5a5a;
+}
+
+/* ============================================
+   Success Page
+   ============================================ */
+.success-message {
+  font-size: 14px;
+  color: #5a5a5a;
+  line-height: 20px;
+}
+
+.success-message p {
+  margin-bottom: 8px;
+}
+
+.success-message .highlight {
+  margin-top: 12px;
+}
+
+/* ============================================
+   Loading & Error
+   ============================================ */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #999;
+}
+
+.error-msg {
+  color: #dc000c;
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.toast {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.toast.show {
+  opacity: 1;
+}
